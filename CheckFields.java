@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
  * @Date 2018/12/12 - 23:16
  */
 public class CheckFields {
+    
     /**
      * 对象的类的默认的基础包名
      */
