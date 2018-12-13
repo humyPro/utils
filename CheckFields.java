@@ -26,7 +26,7 @@ public class CheckFileds {
      * 判断一个model中的字段有没有空的值
      *
      * @param t               需要判断的对象
-     * @param basePackageName 需要检测字段所在的包名，默认是com.shanglv51下
+     * @param basePackageName 需要检测字段所在的包名，默认是com.humy下
      * @return
      */
     public static boolean checkFiledsIsEmpty(Object t, String basePackageName) {
@@ -41,7 +41,7 @@ public class CheckFileds {
      * @return
      */
     public static boolean checkFiledsIsEmpty(Object t, String[] ignoreFields) {
-        String defaultBasePackageName = "com.shanglv51";
+        String defaultBasePackageName = "com.humy";
         return checkFiledsIsEmpty(t, defaultBasePackageName, ignoreFields);
     }
 
