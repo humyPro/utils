@@ -54,8 +54,32 @@ public class CheckFileds {
      * @return
      */
     public static boolean checkFiledsIsEmpty(Object t, String basePackageName, String[] ignoreFields) {
-        if (t == null) {
+         if (t == null) {
             return true;
+        }
+
+        if(t.getClass().isArray()){
+            for (int i = 0; i < Array.getLength(t); i++) {
+                boolean flag = checkFiledsIsEmpty(Array.get(t, i), basePackageName, ignoreFields);
+                if (flag == true) {
+                    return true;
+                }
+            }
+            return false;
+        }else if (Collection.class.isAssignableFrom(t.getClass())) {
+            Collection collection = (Collection) t;
+            for (Object o1 : collection) {
+                boolean flag = checkFiledsIsEmpty(o1, basePackageName, ignoreFields);
+                if (flag == true) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        basePackageName = basePackageName == null ? defaultBasePackageName : basePackageName;
+
+        if (t.getClass().getPackage() == null && !t.getClass().getPackage().getName().startsWith(basePackageName)) {
+            return t.toString().length()==0;
         }
         Field[] fields = t.getClass().getDeclaredFields();
         if (ignoreFields != null && ignoreFields.length != 0) {
@@ -92,7 +116,7 @@ public class CheckFileds {
                     Collection collection = (Collection) o;
                     for (Object o1 : collection) {
                         boolean flag = checkFiledsIsEmpty(o1, basePackageName, ignoreFields);
-                        if(flag==true){
+                        if (flag == true) {
                             return true;
                         }
                     }
@@ -106,11 +130,12 @@ public class CheckFileds {
                     e.printStackTrace();
                 }
                 boolean flag = checkFiledsIsEmpty(o, basePackageName, ignoreFields);
-                if(flag==true){
-                    return  true;
+                if (flag == true) {
+                    return true;
                 }
             }
         }
+
         return false;
     }
 }
