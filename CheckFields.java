@@ -78,7 +78,7 @@ public class CheckFileds {
         }
         basePackageName = basePackageName == null ? defaultBasePackageName : basePackageName;
 
-        if (t.getClass().getPackage() == null && !t.getClass().getPackage().getName().startsWith(basePackageName)) {
+        if (t.getClass().getPackage() == null || !t.getClass().getPackage().getName().startsWith(basePackageName)) {
             return t.toString().length()==0;
         }
         Field[] fields = t.getClass().getDeclaredFields();
