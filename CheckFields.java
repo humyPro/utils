@@ -58,18 +58,18 @@ public class CheckFileds {
             return true;
         }
 
-        if(t.getClass().isArray()){
+        if (t.getClass().isArray()) {
             for (int i = 0; i < Array.getLength(t); i++) {
-                boolean flag = checkFiledsIsEmpty(Array.get(t, i), basePackageName, ignoreFields);
+                boolean flag = isObjHasEmptyField(Array.get(t, i), basePackageName, ignoreFields);
                 if (flag == true) {
                     return true;
                 }
             }
             return false;
-        }else if (Collection.class.isAssignableFrom(t.getClass())) {
+        } else if (Collection.class.isAssignableFrom(t.getClass())) {
             Collection collection = (Collection) t;
             for (Object o1 : collection) {
-                boolean flag = checkFiledsIsEmpty(o1, basePackageName, ignoreFields);
+                boolean flag = isObjHasEmptyField(o1, basePackageName, ignoreFields);
                 if (flag == true) {
                     return true;
                 }
@@ -79,14 +79,21 @@ public class CheckFileds {
         basePackageName = basePackageName == null ? defaultBasePackageName : basePackageName;
 
         if (t.getClass().getPackage() == null || !t.getClass().getPackage().getName().startsWith(basePackageName)) {
-            return t.toString().length()==0;
+            return t.toString().length() == 0;
         }
+
+        if (t.getClass().getPackage().getName().startsWith("java.lang")) {
+            throw new RuntimeException("将递归进入java.lang包下，请检查受检包名");
+        }
+
         Field[] fields = t.getClass().getDeclaredFields();
         if (ignoreFields != null && ignoreFields.length != 0) {
             String[] _ignoreFields = Arrays.stream(ignoreFields).filter(s -> s.startsWith(t.getClass().getSimpleName())).toArray(value -> new String[value]);
             fields = Arrays.stream(fields).filter(field -> {
                 for (String ignoreField : _ignoreFields) {
-                    return !ignoreField.equals(t.getClass().getSimpleName() + "." + field.getName());
+                    if(ignoreField.equals(t.getClass().getSimpleName() + "." + field.getName())){
+                        return false;
+                    }
                 }
                 return true;
             }).toArray(value -> new Field[value]);
@@ -107,7 +114,7 @@ public class CheckFileds {
                 }
                 if ((o.getClass().isArray())) {
                     for (int i = 0; i < Array.getLength(o); i++) {
-                        boolean flag = checkFiledsIsEmpty(Array.get(o, i), basePackageName, ignoreFields);
+                        boolean flag = isObjHasEmptyField(Array.get(o, i), basePackageName, ignoreFields);
                         if (flag == true) {
                             return true;
                         }
@@ -115,13 +122,15 @@ public class CheckFileds {
                 } else if (Collection.class.isAssignableFrom(o.getClass())) {
                     Collection collection = (Collection) o;
                     for (Object o1 : collection) {
-                        boolean flag = checkFiledsIsEmpty(o1, basePackageName, ignoreFields);
+                        boolean flag = isObjHasEmptyField(o1, basePackageName, ignoreFields);
                         if (flag == true) {
                             return true;
                         }
                     }
-                } else if (o.toString().length() == 0) {
-                    return true;
+                } else {
+                    if (o.toString().length() == 0) {
+                        return true;
+                    }
                 }
             } else {
                 try {
@@ -129,13 +138,12 @@ public class CheckFileds {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
-                boolean flag = checkFiledsIsEmpty(o, basePackageName, ignoreFields);
+                boolean flag = isObjHasEmptyField(o, basePackageName, ignoreFields);
                 if (flag == true) {
                     return true;
                 }
             }
         }
-
         return false;
     }
 }
